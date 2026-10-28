@@ -1,41 +1,27 @@
 /**
- * Cloudflare Workers config for Cloudmark (Hono + React SPA).
- * https://developers.cloudflare.com/workers/wrangler/configuration/
+ * Personal Cloudmark fork.
+ * scripts/setup-cloudflare-d1.mjs injects the D1 ID during CI deployment.
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "cloudmark",
+  "name": "cloudmark-christorng",
   "compatibility_date": "2025-04-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./src/worker/index.ts",
   "workers_dev": true,
-  "preview_urls": true,
+  "preview_urls": false,
   "assets": {
     "not_found_handling": "single-page-application",
     "binding": "ASSETS",
-    // API must hit the Worker; without this, SPA fallback can swallow /api/*
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*"]
   },
-  "observability": {
-    "enabled": true,
-  },
+  "observability": { "enabled": true },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "cloudmark",
-      "database_id": "8f839713-421d-45e3-8f81-7c593a0c4b2e",
-      "migrations_dir": "migrations",
-    },
-  ],
-  "vars": {
-    "BASE_URL": "https://cloudmark.site",
-  },
-  /**
-   * Custom domain — DNS for cloudmark.site must point at Cloudflare.
-   * workers.dev URL remains available as a fallback.
-   */
-  "routes": [
-    { "pattern": "cloudmark.site", "custom_domain": true },
-    { "pattern": "www.cloudmark.site", "custom_domain": true },
-  ],
+      "database_name": "cloudmark-christorng",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
 }

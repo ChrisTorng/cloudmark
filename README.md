@@ -1,8 +1,10 @@
-# Cloudmark
+# Cloudmark — ChrisTorng Fork
+
+> **Personal deployment:** This fork uses your own Cloudflare Worker and D1 database. Start with [Traditional Chinese deployment instructions](DEPLOY.zh-TW.md) and the [manual GitHub Actions workflow](https://github.com/ChrisTorng/cloudmark/actions/workflows/deploy-cloudflare.yml). The upstream one-click deployment badge below is intentionally removed to avoid deploying the wrong repository or upstream database bindings.
+
 
 [![AGPL LICENSE](https://img.shields.io/badge/LICENSE-AGPL-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Try It Online](https://img.shields.io/badge/TryIt-Online-orange.svg)](https://cloudmark.site/)
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/wesleyel/cloudmark)
 
 [中文文档](README.zh.md)
 
@@ -120,7 +122,6 @@ pnpm preview
 
 One-click deploy (creates a Cloudflare Worker from this repo):
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/wesleyel/cloudmark)
 
 Or from your machine:
 

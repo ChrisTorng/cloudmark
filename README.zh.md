@@ -1,8 +1,10 @@
-# Cloudmark
+# Cloudmark — ChrisTorng Fork
+
+> **個人版部署：** 請先閱讀 [繁體中文部署說明](DEPLOY.zh-TW.md)，再由 [GitHub Actions](https://github.com/ChrisTorng/cloudmark/actions/workflows/deploy-cloudflare.yml) 執行。不要使用上游作者的 D1 UUID、部署網域或一鍵部署按鈕。
+
 
 [![AGPL LICENSE](https://img.shields.io/badge/LICENSE-AGPL-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![在线试用](https://img.shields.io/badge/TryIt-Online-orange.svg)](https://cloudmark.site/)
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/wesleyel/cloudmark)
 
 [English](README.md)
 
@@ -89,7 +91,6 @@ pnpm dev
 
 一键部署（从本仓库创建 Cloudflare Worker）：
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/wesleyel/cloudmark)
 
 或在本机：
 

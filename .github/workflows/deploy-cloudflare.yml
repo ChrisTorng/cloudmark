@@ -1,0 +1,48 @@
+name: Deploy Cloudmark to Cloudflare
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudmark-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check Cloudflare credentials
+        shell: bash
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in repository Actions secrets."
+            exit 1
+          fi
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Create or reuse D1 and configure Wrangler
+        run: node scripts/setup-cloudflare-d1.mjs
+      - name: Apply D1 migrations
+        run: pnpm exec wrangler d1 migrations apply cloudmark-christorng --remote
+      - name: Build and deploy
+        run: pnpm run deploy
+      - name: Summarize
+        run: |
+          echo "Cloudmark deployment completed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Expected URL, when workers.dev is enabled: https://cloudmark-christorng.christorng.workers.dev/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verify the /api/health endpoint before adding bookmarks." >> "$GITHUB_STEP_SUMMARY"

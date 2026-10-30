@@ -32,6 +32,7 @@ interface BookmarkRowProps {
   canWrite: boolean;
   onSelect: (event: MouseEvent) => void;
   onToggle: () => void;
+  onTitleSelect: () => void;
   onOpen: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -48,6 +49,7 @@ export const BookmarkRow = memo(function BookmarkRow({
   canWrite,
   onSelect,
   onToggle,
+  onTitleSelect,
   onOpen,
   onEdit,
   onDelete,
@@ -124,15 +126,24 @@ export const BookmarkRow = memo(function BookmarkRow({
 
       {/* Title / URL / description stack */}
       <div className="flex min-w-0 flex-col gap-0.5 py-0.5">
-        <span
+        <a
+          href={bookmark.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(event) => { event.stopPropagation(); onTitleSelect(); }}
+          onAuxClick={(event) => {
+            event.stopPropagation();
+            if (event.button === 1) onTitleSelect();
+          }}
+          onDoubleClick={(event) => event.stopPropagation()}
           className={cn(
-            "truncate leading-snug",
+            "truncate leading-snug hover:underline focus-visible:underline",
             selected || focused ? "font-semibold text-foreground" : "font-medium text-foreground",
           )}
           title={bookmark.title}
         >
           {bookmark.title}
-        </span>
+        </a>
         <span
           className="truncate text-2xs leading-snug text-muted-foreground"
           title={bookmark.url}

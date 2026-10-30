@@ -1193,6 +1193,7 @@ export function CollectionPage() {
                     selectOnly(index);
                   }}
                   onToggle={() => toggleId(bookmark.uuid, index)}
+                  onTitleSelect={() => selectOnly(index)}
                   onOpen={() =>
                     window.open(bookmark.url, "_blank", "noopener,noreferrer")
                   }

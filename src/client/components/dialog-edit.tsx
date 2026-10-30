@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ import { updateSchema, type UpdateSchema } from "@/shared/schema";
 import type { BookmarkInstance } from "@/shared/types";
 import { updateBookmarkApi } from "@/client/lib/api";
 import { useTranslations } from "@/client/i18n/context";
-import { IconPicker } from "@/client/components/icon-picker";
+import { useDialogViewport } from "@/client/hooks/use-dialog-viewport";
 
 interface DialogEditProps {
   mark: string;
@@ -59,7 +59,8 @@ export function DialogEdit({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreatingNewCategory, setIsCreatingNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
-  const [favicon, setFavicon] = useState<string | undefined>(undefined);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const viewportStyle = useDialogViewport(open);
 
   const form = useForm<UpdateSchema>({
     resolver: zodResolver(updateSchema),
@@ -87,7 +88,6 @@ export function DialogEdit({
         category: bookmark.category,
         favicon: bookmark.favicon,
       });
-      setFavicon(bookmark.favicon);
       setIsCreatingNewCategory(false);
       setNewCategory("");
     }
@@ -109,7 +109,7 @@ export function DialogEdit({
         description: data.description,
         category: isCreatingNewCategory ? newCategory : data.category,
         // Always send favicon field so server applies custom / clear
-        favicon: favicon ?? "",
+        favicon: data.favicon ?? "",
       });
       toast.success(t("updateSuccess"));
       onBookmarkUpdated(updated);
@@ -125,8 +125,16 @@ export function DialogEdit({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent
+        ref={contentRef}
+        className="bookmark-dialog sm:max-w-[425px]"
+        style={viewportStyle}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          contentRef.current?.querySelector<HTMLButtonElement>("button[data-bookmark-close]")?.focus();
+        }}
+      >
+        <DialogHeader className="bookmark-dialog-header">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Pencil className="h-4 w-4" />
             {t("editTitle")}
@@ -137,131 +145,127 @@ export function DialogEdit({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-3 pt-2"
+            className="bookmark-dialog-form"
           >
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5 text-xs">
-                    <Link className="h-3 w-3" />
-                    {t("url")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input className="h-8" autoFocus {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="bookmark-dialog-fields space-y-3">
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5 text-xs">
+                      <Link className="h-3 w-3" />
+                      {t("url")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input className="h-8" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5 text-xs">
-                    <FileText className="h-3 w-3" />
-                    {t("title")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input className="h-8" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5 text-xs">
+                      <FileText className="h-3 w-3" />
+                      {t("title")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input className="h-8" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5 text-xs">
-                    <FileText className="h-3 w-3" />
-                    {t("description")}
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea className="min-h-[60px] text-sm" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-1.5 text-xs">
+                      <FileText className="h-3 w-3" />
+                      {t("description")}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea className="min-h-[60px] text-sm" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5 text-xs">
-                    <Tag className="h-3 w-3" />
-                    {t("category")}
-                  </FormLabel>
-                  {!isCreatingNewCategory ? (
-                    <Select
-                      onValueChange={(v) => {
-                        if (v === "__new__") {
-                          setIsCreatingNewCategory(true);
-                          form.setValue("category", "");
-                        } else {
-                          field.onChange(v);
-                        }
-                      }}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="__new__">
-                          + {t("newCategory")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Input
-                        value={newCategory}
-                        onChange={(e) => {
-                          setNewCategory(e.target.value);
-                          form.setValue("category", e.target.value);
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem className="bookmark-category-row">
+                    <FormLabel className="flex items-center gap-1.5 text-xs">
+                      <Tag className="h-3 w-3" />
+                      {t("category")}
+                    </FormLabel>
+                    {!isCreatingNewCategory ? (
+                      <Select
+                        onValueChange={(v) => {
+                          if (v === "__new__") {
+                            setIsCreatingNewCategory(true);
+                            form.setValue("category", "");
+                          } else {
+                            field.onChange(v);
+                          }
                         }}
-                        placeholder={t("newCategoryPlaceholder")}
-                        className="h-8"
-                        autoFocus
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8"
-                        onClick={() => setIsCreatingNewCategory(false)}
+                        value={field.value}
                       >
-                        {t("backToCategories")}
-                      </Button>
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                        <FormControl>
+                          <SelectTrigger className="h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="__new__">
+                            + {t("newCategory")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input
+                          value={newCategory}
+                          onChange={(e) => {
+                            setNewCategory(e.target.value);
+                            form.setValue("category", e.target.value);
+                          }}
+                          placeholder={t("newCategoryPlaceholder")}
+                          className="h-8"
+                          autoFocus
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8"
+                          onClick={() => setIsCreatingNewCategory(false)}
+                        >
+                          {t("backToCategories")}
+                        </Button>
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <IconPicker
-              value={favicon}
-              onChange={setFavicon}
-              pageUrl={form.watch("url")}
-            />
-
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="bookmark-dialog-footer">
               <DialogClose asChild>
                 <Button type="button" variant="outline" size="sm">
                   {t("cancel")}

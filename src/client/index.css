@@ -668,3 +668,35 @@
     opacity: 1;
   }
 }
+
+/* Bookmark forms: fixed header/actions, one independently scrolling field region. */
+.bookmark-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: calc(100% - 1rem);
+  max-height: calc(var(--bookmark-viewport-height, 100dvh) - 1rem);
+  top: calc(var(--bookmark-viewport-top, 0px) + var(--bookmark-viewport-height, 100dvh) / 2);
+  overflow: hidden;
+  padding: 0;
+  border-radius: 0.75rem;
+}
+.bookmark-dialog-header { flex: none; padding: 1rem 3.5rem 1rem 1rem; text-align: left; }
+.bookmark-dialog > [data-bookmark-close] {
+  top: 0.25rem; right: 0.25rem; width: 2.75rem; height: 2.75rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.bookmark-dialog-form { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.bookmark-dialog-fields { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 1rem 1rem; }
+.bookmark-dialog-fields input, .bookmark-dialog-fields textarea { font-size: 1rem; }
+.bookmark-dialog-fields input, .bookmark-dialog-fields [role="combobox"] { min-height: 2.75rem; }
+.bookmark-dialog-fields textarea { min-height: 4rem; max-height: 10rem; }
+.bookmark-category-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0.5rem 0.75rem; }
+.bookmark-category-row > * { margin-top: 0 !important; min-width: 0; }
+.bookmark-category-row > [id$="-message"] { grid-column: 1 / -1; }
+.bookmark-dialog-footer {
+  flex: none; flex-direction: row; gap: 0.5rem; margin: 0;
+  padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  border-top: 1px solid hsl(var(--border)); background: hsl(var(--card));
+}
+.bookmark-dialog-footer > button { flex: 1; min-height: 2.75rem; margin: 0; font-size: 0.875rem; }

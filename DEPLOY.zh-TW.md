@@ -3,7 +3,17 @@
 這個 Fork 使用 Cloudflare Workers 提供網頁與 API、Cloudflare D1 儲存書籤。
 Android、Windows 只需要瀏覽器，不需要安裝額外 App。
 
-## 部署方式（不使用 ChatGPT Cloudflare／GitHub Repo Creator 連接器）
+## 已完成部署（2026-10-30）
+
+- 網站：https://cloudmark-christorng.christorng.workers.dev/
+- 健康檢查：https://cloudmark-christorng.christorng.workers.dev/api/health
+- Worker 與 D1：`cloudmark-christorng`，D1 binding：`DB`，靜態資產 binding：`ASSETS`。
+- 已套用 `0001_init.sql`、`0002_token_delivered.sql`、`0003_collection_settings.sql`，並記錄於 `d1_migrations`。
+- 本次沿用 `main` 的 `6764952dc23057487f0b96af1168aedb14caa861` 建置，經已授權的 Cloudflare 外掛部署，未變更應用程式碼。
+- GitHub／Cloudflare 外掛連線此次已成功；外掛授權與雲端瀏覽器網站登入是獨立的。
+- 本次未執行 GitHub Actions。下方保留其部署方式，使用前仍須設定 Repository secrets。
+
+## GitHub Actions 部署方式
 
 1. 以自己的 Cloudflare 帳號進入 [API Tokens](https://dash.cloudflare.com/profile/api-tokens)，建立 **Custom Token**，限制在自己的帳號，至少授予 **Workers Scripts: Edit**、**D1: Edit**。不要在聊天、Issue 或公開檔案貼上 Token。
 2. 在 Cloudflare Dashboard 查詢自己的 Account ID（帳號概覽或 Workers & Pages）。
@@ -15,7 +25,7 @@ Android、Windows 只需要瀏覽器，不需要安裝額外 App。
    - https://cloudmark-christorng.christorng.workers.dev/
    - https://cloudmark-christorng.christorng.workers.dev/api/health （應回傳 `{"ok":true,"service":"cloudmark"}`）
 
-**注意**：上面是預期的網址，目前只有程式碼，尚未成功部署網站；如果帳號的 workers.dev 子網域不同，請以 Actions 及 Cloudflare Dashboard 回報的網址為準。
+上面的網址已於 2026-10-30 完成部署並確認可開啟。若未來改用其他 Cloudflare 帳號，請以該次部署與 Cloudflare Dashboard 回報的 workers.dev 子網域為準。
 
 此 Workflow 會自動：
 - 建立或重用名為 `cloudmark-christorng` 的 D1；
